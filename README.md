@@ -1,62 +1,59 @@
-# video-edukasi-3d
+# 3D Education Video
 
-Panduan untuk AI coding agent supaya bisa membuat video animasi edukasi 3D bergaya clay lewat kode, dari naskah sampai MP4 vertikal. Tanpa software 3D dan tanpa menggambar manual.
+A guide for AI coding agents that turns any topic into a vertical 3D clay-style explainer video, from script to MP4. No 3D software and no manual drawing: characters, the set, camera moves, and graphics are all defined in one JSON file and rendered with Three.js, Puppeteer, and FFmpeg.
 
-*A guide for AI coding agents that turns a script into a vertical 3D clay-style explainer video using Three.js, Puppeteer, and FFmpeg. The script and docs are in Indonesian.*
+## What it does
 
-Contoh yang disertakan adalah seri "Raka vs Dina" tentang money management di trading, tapi set dan karakternya bisa diubah untuk topik lain.
+1. Writes a script with dialogue, expressions, camera moves, and visuals for each scene.
+2. Builds your own cast and set from that script.
+3. Renders test frames on the CPU with a time limit, so your laptop doesn't freeze.
+4. Measures your voice clips and fits the animation timing to them.
+5. Renders the full video and adds the voices.
 
-## Yang dikerjakan skill ini
+## Install
 
-1. Menulis naskah JSON: dialog, ekspresi, kamera, dan visual tiap adegan.
-2. Mengarahkan adegan dengan kode: pose, kamera, grafik, dan subtitle.
-3. Merender frame uji lewat CPU dengan batas waktu, supaya laptop tidak freeze.
-4. Mengukur durasi suara per adegan dan menyesuaikan timing animasi.
-5. Merender video penuh dan menggabungkannya dengan suara.
-
-## Pasang
-
-Cara paling umum, dan bisa dipakai di AI mana pun yang bisa membaca file dan menjalankan perintah:
+This works with any AI tool that can read files and run commands:
 
 ```bash
-git clone https://github.com/deaguss/inna-skill-video-3D-education.git video-edukasi-3d
+git clone https://github.com/deaguss/inna-skill-video-3D-education.git 3d-education-video
 ```
 
-Buka folder `video-edukasi-3d` di alat AI kamu, lalu minta misalnya: "Bikin video animasi 3D tentang stop loss, 45 detik, buat TikTok."
+Open the `3d-education-video` folder in your AI tool, then ask something like: "Make a 45-second 3D animated video about black holes for TikTok."
 
-| Alat AI | File yang dibaca otomatis |
+| AI tool | File it reads automatically |
 |---|---|
 | Claude Code | `CLAUDE.md` |
 | Codex CLI | `AGENTS.md` |
 | Gemini CLI | `GEMINI.md` |
-| Cursor | `.cursor/rules/video-edukasi-3d.mdc` |
+| Cursor | `.cursor/rules/3d-education-video.mdc` |
 | GitHub Copilot | `.github/copilot-instructions.md` |
-| Alat lain | Bilang: "Baca `SKILL.md` lalu ikuti alurnya." |
+| Other tools | Say: "Read `SKILL.md` and follow its workflow." |
 
-Semua file di atas menunjuk ke `SKILL.md`, jadi cukup perbarui satu panduan.
+All of these point to `SKILL.md`, so there is only one guide to maintain.
 
-Khusus Claude Code, skill ini juga bisa dipasang permanen supaya tersedia di semua proyek:
+To make it available in every project in Claude Code, install it as a skill:
 
 ```bash
-git clone https://github.com/deaguss/inna-skill-video-3D-education.git ~/.claude/skills/video-edukasi-3d
+git clone https://github.com/deaguss/inna-skill-video-3D-education.git ~/.claude/skills/3d-education-video
 ```
 
-Butuh Node.js 18 atau lebih baru. Saat proyek video pertama dibuat, npm mengunduh Three.js, Chrome, dan FFmpeg ke folder proyek, totalnya sekitar 800 MB.
+You need Node.js 18 or newer. The first video project downloads Three.js, Chrome, and FFmpeg into the project folder, about 800 MB in total.
 
-AI versi chat di browser, seperti ChatGPT atau Gemini di web, tidak bisa menjalankan render di laptop kamu. Di sana kamu cuma bisa memakai panduan ini untuk naskah dan kode, lalu menjalankan perintahnya sendiri.
+Browser-based chat AIs can't run the render on your computer. There, you can use this guide for the script, then run the commands yourself.
 
-## Batasan
+## Make it yours
 
-- Hasil terbaik saat ini kualitas preview (540×960 dirender lewat CPU, keluaran 720×1280), tanpa blur kamera asli.
-- Suara tidak dibuat oleh skill ini. Siapkan rekaman sendiri atau hasil layanan TTS.
-- Bibir hanya buka-tutup, bukan lip-sync presisi.
-- Render lewat GPU bisa membebani laptop dengan GPU terintegrasi, jadi defaultnya CPU.
-- Sejauh ini baru diuji di Windows 11 dengan Claude Code. Alat AI lain belum diuji.
+The included "Why is the sky blue?" video is only an example. Describe your topic and audience, and the AI writes a new `script.json` with its own characters and set. `references/scene-guide.md` lists every option.
 
-## Disclaimer
+## Limitations
 
-Contoh angka trading di repo ini adalah ilustrasi hipotetis, bukan saran investasi. Trading berisiko rugi. Kamu bertanggung jawab atas konten yang kamu publikasikan, termasuk kepatuhan pada aturan setempat dan kebijakan platform.
+- CPU renders are preview quality (540×960 scaled to 720×1280), without real camera blur.
+- Voices aren't generated for you. Record your own or use a text-to-speech service.
+- Mouths open and close but aren't precisely lip-synced.
+- Characters sit behind a desk. Walking and other sets need code changes.
+- GPU rendering can overload laptops with integrated graphics, so the CPU is the default.
+- So far it has only been tested on Windows 11 with Claude Code. A clean install and other AI tools haven't been tested yet.
 
-## Lisensi
+## License
 
 [MIT](LICENSE)

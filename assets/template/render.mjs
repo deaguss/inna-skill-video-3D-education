@@ -1,8 +1,8 @@
-// Pakai:
-//   node render.mjs --still 1,5.5,20 --out uji        simpan frame di detik tertentu sebagai PNG
-//   node render.mjs --dari 0 --sampai 10 --out a.mp4  render potongan video
-//   node render.mjs --out hasil.mp4                   render seluruh video
-// Opsi: --ringan (paksa CPU, wajib kecuali GPU sudah terbukti aman), --skala 0.75, --sampel N (default 16), --batas DETIK.
+// Usage:
+//   node render.mjs --still 1,5.5,20 --out test      save frames at the given seconds as PNG
+//   node render.mjs --from 0 --to 10 --out a.mp4     render part of the video
+//   node render.mjs --out result.mp4                 render the whole video
+// Options: --light (force CPU, required unless the GPU is proven safe), --scale 0.75, --samples N (default 16), --limit SECONDS.
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,115 +11,115 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
 import ffmpegPath from 'ffmpeg-static';
 
-const akar = path.dirname(fileURLToPath(import.meta.url));
-const arg = (nama, bawaan) => {
-  const i = process.argv.indexOf(`--${nama}`);
-  return i >= 0 ? process.argv[i + 1] : bawaan;
+const root = path.dirname(fileURLToPath(import.meta.url));
+const arg = (name, fallback) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i >= 0 ? process.argv[i + 1] : fallback;
 };
 
-function cariModul() {
-  let d = akar;
+function findModules() {
+  let dir = root;
   for (;;) {
-    const c = path.join(d, 'node_modules');
-    if (fs.existsSync(path.join(c, 'three'))) return c;
-    const induk = path.dirname(d);
-    if (induk === d) throw new Error('node_modules/three tidak ketemu. Jalankan npm install dulu.');
-    d = induk;
+    const candidate = path.join(dir, 'node_modules');
+    if (fs.existsSync(path.join(candidate, 'three'))) return candidate;
+    const parent = path.dirname(dir);
+    if (parent === dir) throw new Error('node_modules/three not found. Run npm install first.');
+    dir = parent;
   }
 }
-const folderModul = cariModul();
+const modulesDir = findModules();
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json' };
 const server = http.createServer((req, res) => {
-  const alamat = decodeURIComponent(req.url.split('?')[0]);
-  const dariModul = alamat.startsWith('/node_modules/');
-  const dasar = dariModul ? folderModul : akar;
-  const lokasi = path.join(dasar, dariModul ? alamat.slice('/node_modules/'.length) : alamat);
-  if (!lokasi.startsWith(dasar) || !fs.existsSync(lokasi) || fs.statSync(lokasi).isDirectory()) {
+  const url = decodeURIComponent(req.url.split('?')[0]);
+  const fromModules = url.startsWith('/node_modules/');
+  const base = fromModules ? modulesDir : root;
+  const file = path.join(base, fromModules ? url.slice('/node_modules/'.length) : url);
+  if (!file.startsWith(base) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
     res.writeHead(404).end();
     return;
   }
-  res.writeHead(200, { 'Content-Type': MIME[path.extname(lokasi)] || 'application/octet-stream' });
-  fs.createReadStream(lokasi).pipe(res);
+  res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+  fs.createReadStream(file).pipe(res);
 });
 await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const port = server.address().port;
 
-const ringan = process.argv.includes('--ringan');
+const light = process.argv.includes('--light');
 const browser = await puppeteer.launch({
   headless: true,
-  args: ringan
+  args: light
     ? ['--use-angle=swiftshader', '--enable-unsafe-swiftshader']
     : [`--use-angle=${arg('angle', 'd3d11')}`, '--enable-gpu', '--ignore-gpu-blocklist', '--enable-unsafe-swiftshader'],
   protocolTimeout: 600000,
 });
 
-const hentikan = (kode) => {
+const stop = (code) => {
   const pid = browser.process()?.pid;
-  if (pid) spawnSync('taskkill', ['/pid', String(pid), '/T', '/F']);
-  process.exit(kode);
+  if (pid && process.platform === 'win32') spawnSync('taskkill', ['/pid', String(pid), '/T', '/F']);
+  else if (pid) browser.process().kill('SIGKILL');
+  process.exit(code);
 };
-const batas = Number(arg('batas', 0));
-if (batas) {
+const limit = Number(arg('limit', 0));
+if (limit) {
   setTimeout(() => {
-    console.error(`BATAS WAKTU ${batas} dtk tercapai, render dihentikan.`);
-    hentikan(2);
-  }, batas * 1000);
+    console.error(`TIME LIMIT of ${limit}s reached, render stopped.`);
+    stop(2);
+  }, limit * 1000);
 }
 
 const page = await browser.newPage();
-page.on('pageerror', (e) => console.error('HALAMAN ERROR:', e.message));
-page.on('console', (m) => {
-  console.error('KONSOL:', m.text());
-});
+page.on('pageerror', (e) => console.error('PAGE ERROR:', e.message));
+page.on('console', (m) => console.error('CONSOLE:', m.text()));
 await page.setViewport({ width: 720, height: 1280 });
-const kueri = ringan ? `?ringan=1&skala=${arg('skala', '0.5')}` : '';
-await page.goto(`http://127.0.0.1:${port}/animasi/index.html${kueri}`);
-await page.waitForFunction('window.siap === true', { timeout: 120000 });
-const info = await page.evaluate(() => window.infoCerita);
-console.log(`GPU: ${info.gpu}`);
-if (ringan && !/swiftshader/i.test(info.gpu)) {
-  console.error('Mode ringan batal: browser tidak memakai renderer CPU.');
-  hentikan(3);
+const query = light ? `?light=1&scale=${arg('scale', '0.5')}` : '';
+await page.goto(`http://127.0.0.1:${port}/scene/index.html${query}`);
+await page.waitForFunction('window.ready === true', { timeout: 120000 });
+const info = await page.evaluate(() => window.storyInfo);
+console.log(`Renderer: ${info.gpu}`);
+if (light && !/swiftshader/i.test(info.gpu)) {
+  console.error('Light mode cancelled: the browser is not using the CPU renderer.');
+  stop(3);
 }
-console.log(`Total: ${info.total.toFixed(1)} detik`);
+console.log(`Total: ${info.total.toFixed(1)} seconds`);
+console.log(info.scenes.map((s) => `${s.id}@${s.start}`).join(' '));
 
-const sampel = Number(arg('sampel', 16));
-const keluar = arg('out', 'hasil.mp4');
-const ambil = (i) => page.evaluate((f, n) => window.renderFrame(f, n), i, sampel);
-const keBuffer = (url) => Buffer.from(url.slice(url.indexOf(',') + 1), 'base64');
+const samples = Number(arg('samples', 16));
+const out = arg('out', 'result.mp4');
+const grab = (i) => page.evaluate((f, n) => window.renderFrame(f, n), i, samples);
+const toBuffer = (url) => Buffer.from(url.slice(url.indexOf(',') + 1), 'base64');
 
 const still = arg('still');
 if (still) {
-  fs.mkdirSync(keluar, { recursive: true });
-  for (const d of still.split(',').map(Number)) {
-    const mulai = Date.now();
-    const data = await ambil(Math.round(d * info.fps));
-    fs.writeFileSync(path.join(keluar, `t${String(d).padStart(5, '0')}.png`), keBuffer(data));
-    console.log(`t=${d}s selesai dalam ${Date.now() - mulai} ms`);
+  fs.mkdirSync(out, { recursive: true });
+  for (const s of still.split(',').map(Number)) {
+    const began = Date.now();
+    const data = await grab(Math.round(s * info.fps));
+    fs.writeFileSync(path.join(out, `t${String(s).padStart(5, '0')}.png`), toBuffer(data));
+    console.log(`t=${s}s done in ${Date.now() - began} ms`);
   }
 } else {
-  const dari = Number(arg('dari', 0));
-  const sampai = Math.min(Number(arg('sampai', info.total)), info.total);
-  const f0 = Math.round(dari * info.fps);
-  const f1 = Math.round(sampai * info.fps);
-  const ff = spawn(ffmpegPath, [
+  const from = Number(arg('from', 0));
+  const to = Math.min(Number(arg('to', info.total)), info.total);
+  const first = Math.round(from * info.fps);
+  const end = Math.round(to * info.fps);
+  const ffmpeg = spawn(ffmpegPath, [
     '-y', '-f', 'image2pipe', '-framerate', String(info.fps), '-c:v', 'png', '-i', '-',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', keluar,
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', out,
   ], { stdio: ['pipe', 'ignore', 'ignore'] });
-  const mulai = Date.now();
-  for (let i = f0; i < f1; i++) {
-    const data = keBuffer(await ambil(i));
-    if (!ff.stdin.write(data)) await new Promise((r) => ff.stdin.once('drain', r));
-    if ((i - f0) % 30 === 0) {
-      const lewat = (Date.now() - mulai) / 1000;
-      const selesai = i - f0 + 1;
-      console.log(`frame ${selesai}/${f1 - f0}, ${(lewat / selesai).toFixed(2)} dtk/frame, sisa ${Math.round((lewat / selesai) * (f1 - i))} dtk`);
+  const began = Date.now();
+  for (let i = first; i < end; i++) {
+    const data = toBuffer(await grab(i));
+    if (!ffmpeg.stdin.write(data)) await new Promise((r) => ffmpeg.stdin.once('drain', r));
+    if ((i - first) % 30 === 0) {
+      const elapsed = (Date.now() - began) / 1000;
+      const done = i - first + 1;
+      console.log(`frame ${done}/${end - first}, ${(elapsed / done).toFixed(2)} s/frame, ${Math.round((elapsed / done) * (end - i))} s left`);
     }
   }
-  ff.stdin.end();
-  await new Promise((r) => ff.on('close', r));
-  console.log(`Selesai: ${keluar}`);
+  ffmpeg.stdin.end();
+  await new Promise((r) => ffmpeg.on('close', r));
+  console.log(`Done: ${out}`);
 }
 
 await browser.close();

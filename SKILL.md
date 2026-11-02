@@ -1,120 +1,113 @@
 ---
-name: video-edukasi-3d
-description: Membuat video animasi edukasi 3D bergaya clay lewat kode (Three.js, Puppeteer, FFmpeg), dari naskah sampai MP4 vertikal untuk TikTok, Reels, atau Shorts. Gunakan skill ini setiap kali pengguna ingin membuat video animasi, video edukasi, explainer, konten animasi 3D, atau seri "Raka vs Dina", termasuk ketika mereka hanya menyebut topik seperti "bikinin video soal stop loss" atau mengirim contoh video yang ingin ditiru gayanya. Also use for 3D animated explainer videos made with code.
+name: 3d-education-video
+description: Creates 3D clay-style animated explainer videos with code (Three.js, Puppeteer, FFmpeg), from script to vertical MP4 for TikTok, Reels, or Shorts. Use this skill whenever the user wants an animated video, educational video, explainer, or 3D animated content on any topic, including when they only name a topic like "make a video about black holes" or share a video whose style they want to match. No 3D software required.
 ---
 
-# Video Edukasi 3D
+# 3D Education Video
 
-Skill ini mengubah topik menjadi video vertikal 3D bergaya clay tanpa software 3D. Karakter, set, kamera, dan subtitle semuanya kode.
+This skill turns any topic into a vertical 3D clay-style video without 3D software. Characters, the set, camera moves, and on-screen graphics are all defined in one file, `script.json`.
 
-Pengguna biasanya bukan programmer. Jelaskan dengan bahasa sehari-hari, gunakan bahasa pengguna, dan tunjukkan hasil, bukan kode.
+Users are often not programmers. Explain things in plain language, work in the user's language, and show results rather than code.
 
-Panduan ini berlaku untuk AI apa pun yang bisa membaca file dan menjalankan perintah. Sesuaikan kalau alatnya terbatas:
+This guide works with any AI agent that can read files and run commands. Adapt if your tool is limited:
 
-- **Tidak bisa melihat gambar:** minta pengguna memeriksa `lembar.png`, lalu perbaiki sesuai laporan mereka. Jangan mengaku sudah memeriksa gambar.
-- **Tidak bisa menjalankan proses di latar belakang:** berikan perintah render penuh untuk dijalankan pengguna di terminal, supaya perintahnya tidak terputus karena batas waktu.
-- **Tidak bisa menjalankan perintah sama sekali:** bantu naskah dan kode, lalu berikan perintahnya satu per satu untuk dijalankan pengguna.
+- **Can't view images:** ask the user to check `sheet.png` and fix what they report. Don't claim you checked an image.
+- **Can't run background processes:** give the user the full render command to run in their own terminal, so a tool timeout doesn't kill it.
+- **Can't run commands at all:** help with the script, then give the user the commands one at a time.
 
-## Alur kerja
+## Workflow
 
-Kerjakan berurutan. Revisi naskah gratis, sedangkan render makan waktu, jadi minta persetujuan sebelum tahap yang mahal.
+Work in order. Script revisions are free and renders take time, so get approval before the expensive steps.
 
-### 1. Tentukan brief
+### 1. Settle the brief
 
-Tanyakan hanya yang belum jelas: topik, penonton, durasi, dan platform. Akun baru lebih cocok 30–45 detik. Kalau pengguna mengirim video contoh, ambil gayanya dari beberapa frame, tapi buat karakter sendiri. Jangan menjiplak karakter orang lain atau mengunduh videonya.
+Ask only what isn't clear: topic, audience, length, platform, and how many characters. New accounts usually do better with 30–45 seconds. If the user shares a reference video, take the style from a few frames, but create original characters. Don't copy someone else's characters or download their video.
 
-### 2. Tulis naskah
+### 2. Write the script
 
-Salin `assets/template/` ke folder proyek, lalu tulis ulang `naskah.json`. Formatnya bisa dilihat dari contoh di dalamnya.
+Copy `assets/template/` to a new project folder, then replace `script.json` completely. The bundled "Why is the sky blue?" video and its characters are only an example, so design a cast and set that fit the user's topic and brand. `references/scene-guide.md` lists every option.
 
-- Buka dengan momen paling menarik, karena penonton memutuskan lanjut atau tidak dalam beberapa detik pertama.
-- Pisahkan `suara` (angka dieja) dari `subtitle` (angka berupa digit).
-- Kalau ada angka, hitung dengan skrip dan simpan datanya di `simulasi`. Jangan mengira-ngira, karena angka yang salah merusak kepercayaan pada konten edukasi.
-- Estimasi durasi: jumlah kata dibagi 2,5, ditambah sekitar 0,5 detik per adegan.
-- Untuk topik keuangan, tampilkan disclaimer di `penutup_layar`, tandai contoh sebagai hipotetis, dan hindari sinyal beli/jual atau janji profit.
+- Open with the most interesting moment, because viewers decide whether to stay in the first few seconds.
+- Keep `voice` (numbers spelled out, for text-to-speech) separate from `subtitle` (numbers as digits).
+- Check facts, and calculate any numbers with a script rather than estimating. A wrong number undermines educational content.
+- Estimate length as word count divided by 2.5, plus about 0.5 seconds per scene.
+- For finance, health, or legal topics, put a disclaimer in `end_card`, mark examples as hypothetical, and avoid specific recommendations or promised results.
 
-Tunjukkan naskahnya sebagai tabel dialog dan minta persetujuan sebelum lanjut.
+Show the script as a table of dialogue and get approval before continuing.
 
-### 3. Pasang alat
+### 3. Install the tools
 
-Jalankan `npm install` di folder proyek, tanpa instalasi global. Sebelumnya, beri tahu pengguna bahwa Three.js, Chrome, dan FFmpeg akan terunduh sekitar 800 MB, lalu minta izin. `.puppeteerrc.cjs` menyimpan Chrome di folder proyek. Kalau npm melewati script instalasi, baca dulu script-nya lalu jalankan `npm install-scripts approve ffmpeg-static puppeteer` dan `npm rebuild ffmpeg-static puppeteer`.
+Run `npm install` in the project folder, with no global installs. First, tell the user that Three.js, Chrome, and FFmpeg will download, about 800 MB in total, and ask for permission. `.puppeteerrc.cjs` keeps Chrome inside the project folder. If npm skips the install scripts, read them first, then run `npm install-scripts approve ffmpeg-static puppeteer` and `npm rebuild ffmpeg-static puppeteer`.
 
-### 4. Arahkan adegan
+### 4. Test frames
 
-Baca `references/panduan-adegan.md`, lalu sesuaikan dua file khusus video:
-
-- `animasi/cerita.js`: pose karakter dan kamera per adegan
-- `animasi/overlay.js`: label, papan skor, dan ikon per adegan
-
-`karakter.js`, `dunia.js`, `main.js`, dan `render.mjs` adalah mesin. Ubah hanya kalau video butuh properti atau karakter baru.
-
-### 5. Uji frame
-
-Render frame dari setiap adegan, gabungkan jadi lembar kontak, lalu periksa dan perbaiki sendiri sebelum menunjukkannya ke pengguna:
+Render a frame from every scene, combine them into a contact sheet, then check and fix them yourself before showing the user. The render prints each scene's start time, so you can pick the timestamps.
 
 ```bash
-node render.mjs --ringan --skala 0.75 --sampel 4 --batas 150 --still 1,8,12,17 --out uji
-node lembar.mjs uji lembar.png
+node render.mjs --light --scale 0.75 --samples 4 --limit 150 --still 1,8,12,17 --out test
+node contact-sheet.mjs test sheet.png
 ```
 
-Periksa: wajah terpotong, subjek tertutup, label menumpuk subtitle, dan angka di layar yang tidak cocok dengan naskah. Tahapan perlu diulang setelah perubahan, karena perbaikan satu adegan bisa merusak framing adegan lain.
+Look for cropped faces, hidden subjects, graphics overlapping subtitles, wrong numbers, and eyes or mouths that look off. Recheck after changes. Use a new output folder each time rather than deleting the old one.
 
-### 6. Render preview pendek
+Most fixes belong in `script.json`. Edit the code in `scene/` only when the video needs something the script can't express, such as a new pose or prop shape.
 
-Render sekitar 10 detik pertama, periksa, lalu kirim ke pengguna. Minta mereka menilai gerakan, karena potongan frame tidak menunjukkan gerakan yang kaku.
+### 5. Render a short preview
+
+Render about the first 10 seconds, check it, then send it to the user. Ask them to judge the motion, since stills can't show stiff movement.
 
 ```bash
-node render.mjs --ringan --skala 0.75 --sampel 4 --batas 900 --dari 0 --sampai 10 --out preview.mp4
+node render.mjs --light --scale 0.75 --samples 4 --limit 900 --from 0 --to 10 --out preview.mp4
 ```
 
-### 7. Pasang suara
+### 6. Add voices
 
-Ini sebelum render final, karena durasi suara menentukan timing animasi. Pengguna menyiapkan satu file per adegan di `suara/`, dengan nama sesuai id adegan: `01.wav`, `02.mp3`, dan seterusnya.
+Do this before the final render, because voice length sets the animation timing. The user prepares one clip per scene in `voices/`, named by scene id: `01.wav`, `02.mp3`, and so on.
 
 ```bash
-node suara.mjs ukur
+node voice.mjs measure
 ```
 
-Perintah di atas menulis `durasi_detik` ke `naskah.json`. Cek lagi suara bawaan sistem sebelum menawarkannya, karena Windows sering hanya punya suara bahasa Inggris. API key layanan TTS tetap dipegang pengguna, dan jangan minta mereka menempelkannya di chat.
+This writes `duration_seconds` to `script.json`. Check which system voices exist before offering them, because the language the user needs may not be installed. Any text-to-speech API key stays with the user, so don't ask them to paste it into chat. Web-based tools avoid the key entirely. Remind them to check that their plan allows commercial use.
 
-### 8. Render penuh
+### 7. Full render
 
-Sebutkan perkiraan waktu dari kecepatan yang terukur, lalu minta persetujuan. Render di latar belakang dan ingatkan pengguna supaya laptop tidak sleep.
+Give a time estimate based on the measured speed and get approval. Render in the background and remind the user not to let the laptop sleep.
 
 ```bash
-node render.mjs --ringan --skala 0.75 --sampel 4 --batas 5400 --out video.mp4
-node suara.mjs gabung video.mp4 video-final.mp4
+node render.mjs --light --scale 0.75 --samples 4 --limit 5400 --out video.mp4
+node voice.mjs mux video.mp4 final.mp4
 ```
 
-Setelah selesai, ambil frame dari video jadinya dan periksa sebelum mengirimkannya.
+When it finishes, pull frames from the finished video and check them before sending it.
 
-## Keamanan laptop
+## Protecting the user's machine
 
-Render yang terlalu berat bisa membuat laptop freeze dan pekerjaan yang belum disimpan bisa hilang.
+A render that is too heavy can freeze a laptop and lose unsaved work.
 
-- Selalu pakai `--ringan` sebagai default. Opsi ini memaksa render lewat CPU dan membatalkan render kalau browser tidak memakai renderer CPU.
-- Selalu pasang `--batas` sebagai pengaman waktu.
-- Di Windows, jalankan dengan prioritas rendah dan separuh core:
+- Use `--light` by default. It forces rendering onto the CPU and cancels the render if the browser isn't using the CPU renderer.
+- Always set `--limit` as a time guard.
+- On Windows, run at low priority on half the cores:
   ```bash
   cmd /c "start \"\" /b /low /affinity 3F /wait node render.mjs ..."
   ```
-  `3F` berarti 6 core. Hitung dari jumlah core laptop yang dipakai. Di macOS atau Linux, pakai `nice -n 19`.
-- Mulai dari satu frame. Kalau uji gagal atau kena batas waktu, berhenti dan tanya pengguna. Jangan mencoba ulang berkali-kali dengan variasi lain.
-- Render lewat GPU hanya dengan izin khusus, satu frame dulu, dan setelah pengguna diingatkan untuk menyimpan pekerjaannya.
-- Jangan menghapus file tanpa izin. Simpan hasil uji baru di folder baru.
+  `3F` means 6 cores. Calculate it from the machine's core count. On macOS or Linux, use `nice -n 19`.
+- Start with one frame. If a test fails or hits the limit, find out why before retrying, and ask the user if the machine may be at risk.
+- Use the GPU only with specific permission, one frame first, after reminding the user to save their work.
+- Don't delete files without permission.
 
-## Kualitas dan batas
+## Quality and limits
 
-| Setelan | Kegunaan |
+| Setting | Use |
 |---|---|
-| `--skala 0.75 --sampel 4` | Preview dan rilis di CPU. Tanpa blur kamera asli. |
-| `--sampel 6` atau lebih | Mengaktifkan blur kamera dan bayangan lembut. Pakai minimal 16 supaya tidak berbayang. Jauh lebih lambat. |
+| `--scale 0.75 --samples 4` | Previews and CPU releases. No real camera blur. |
+| `--samples 6` or more | Turns on camera blur and soft shadows. Use at least 16 to avoid ghosting. Much slower. |
 
-Sebagai gambaran, setelan pertama butuh sekitar 0,85 detik per frame di laptop dengan 6 core untuk render, jadi video 84 detik selesai sekitar 35 menit. Ukur ulang di tiap laptop.
+As a guide, the first setting took about 0.8 seconds per frame on a laptop using 6 cores, so an 84-second video took about 35 minutes. Measure again on each machine.
 
-## Kesalahan yang sudah pernah terjadi
+## Mistakes already made
 
-- **Frame pertama macet berapa pun backend-nya:** biasanya kanvas 2D. `ctx.filter = 'blur()'` untuk ribuan bentuk membuat render macet dan diduga menyebabkan freeze. Gambar satu sprite bergradasi lalu pakai `drawImage`.
-- **Gambar berbayang ganda:** blur kamera aktif dengan sampel terlalu sedikit. `main.js` sudah mematikannya di bawah 6 sampel.
-- **Timer pengaman membuat proses tidak selesai:** akhiri skrip dengan `process.exit(0)`.
-- **Kata "PT" pada logo:** di Indonesia terbaca sebagai perseroan terbatas.
+- **The first frame hangs on every backend:** usually the 2D canvas. Using `ctx.filter = 'blur()'` on thousands of shapes hung the render and was the suspected cause of a laptop freeze. Draw one gradient sprite and reuse it with `drawImage`.
+- **Doubled images:** camera blur with too few samples. `main.js` already turns it off below 6 samples.
+- **Eyes turn blank white:** scaling a pupil on all axes pushed it inside the eyeball. Scale pupils on x and y only.
+- **A check that silently failed:** a mistyped search printed nothing and the script reported "clean". Check the exit code before trusting a scan, especially before publishing.

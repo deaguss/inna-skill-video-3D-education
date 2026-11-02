@@ -1,0 +1,127 @@
+{
+  "title": "Why Is the Sky Blue?",
+  "end_title": "Why is the sky blue?",
+  "end_card": "Because air scatters blue light far more than red.",
+  "set": {
+    "wall": "#5d7fa8",
+    "floor": "#3f4a63",
+    "desk": "#d9c7ae",
+    "panel": "#a58f76"
+  },
+  "cast": {
+    "mia": {
+      "name": "Mia",
+      "seat": "left",
+      "skin": "#c98f6b",
+      "shirt": "#7a5cd6",
+      "pants": "#2d3350",
+      "hair": "#2b1d1a",
+      "hairStyle": "long",
+      "cheeks": true
+    },
+    "leo": {
+      "name": "Leo",
+      "seat": "right",
+      "skin": "#e6b48f",
+      "shirt": "#e9a83a",
+      "pants": "#34405c",
+      "hair": "#7a4a22",
+      "hairStyle": "short"
+    }
+  },
+  "scenes": [
+    {
+      "id": 1,
+      "speaker": "leo",
+      "voice": "Why is the sky blue? It's just air.",
+      "subtitle": "Why is the sky blue? It's just air.",
+      "expression": "curious",
+      "camera": { "shot": "wide", "move": "pull" },
+      "actions": { "leo": { "pose": "think", "look": "up" }, "mia": { "look": "other" } },
+      "overlays": [
+        { "type": "label", "target": "mia", "text": "Mia", "color": "#c9b8ff" },
+        { "type": "label", "target": "leo", "text": "Leo", "color": "#ffd27a", "at": 0.3 }
+      ]
+    },
+    {
+      "id": 2,
+      "speaker": "mia",
+      "voice": "Sunlight looks white, but it's really every color mixed together.",
+      "subtitle": "Sunlight looks white, but it's really every color mixed together.",
+      "expression": "happy",
+      "hold": 0.4,
+      "camera": { "shot": "medium:mia", "move": "push" },
+      "actions": { "mia": { "pose": "explain", "look": "camera" } },
+      "props": [{ "shape": "sphere", "color": "#ffd76a", "size": 0.42, "pos": [-0.15, 2.45, -0.5], "glow": true, "at": 0.4 }]
+    },
+    {
+      "id": 3,
+      "speaker": "narrator",
+      "voice": "When that light hits the air, blue scatters about five times more than red.",
+      "subtitle": "When that light hits the air, blue scatters about 5x more than red.",
+      "expression": "relaxed",
+      "hold": 0.6,
+      "camera": { "shot": "wide", "move": "none" },
+      "overlays": [{ "type": "number", "value": "≈5x", "text": "more scattering for blue than for red", "color": "#7fc6ff", "at": 0.4 }]
+    },
+    {
+      "id": 4,
+      "speaker": "leo",
+      "voice": "So the sky is just scattered sunlight?",
+      "subtitle": "So the sky is just scattered sunlight?!",
+      "expression": "shocked",
+      "camera": { "shot": "closeup:leo", "move": "push" },
+      "actions": { "leo": { "pose": "shocked", "look": "camera" } }
+    },
+    {
+      "id": 5,
+      "speaker": "mia",
+      "voice": "Exactly. Blue reaches your eyes from every direction.",
+      "subtitle": "Exactly. Blue reaches your eyes from every direction.",
+      "expression": "confident",
+      "camera": { "shot": "closeup:mia", "move": "none" },
+      "actions": { "mia": { "pose": "nod", "look": "camera" } }
+    },
+    {
+      "id": 6,
+      "speaker": "leo",
+      "voice": "Then why are sunsets red?",
+      "subtitle": "Then why are sunsets red?",
+      "expression": "curious",
+      "camera": { "shot": "medium:leo", "move": "push" },
+      "actions": { "leo": { "pose": "think", "look": "other" } }
+    },
+    {
+      "id": 7,
+      "speaker": "narrator",
+      "voice": "At sunset, light crosses much more air. Most of the blue scatters away, and the reds are left.",
+      "subtitle": "At sunset, light crosses much more air. Most of the blue scatters away, and the reds are left.",
+      "expression": "relaxed",
+      "hold": 0.8,
+      "camera": { "shot": "wide", "move": "orbit" },
+      "overlays": [
+        {
+          "type": "icons",
+          "y": 420,
+          "stagger": 1.1,
+          "at": 0.4,
+          "items": [
+            { "icon": "1", "label": "Longer path", "color": "#ffd27a" },
+            { "icon": "2", "label": "Blue scatters", "color": "#7fc6ff" },
+            { "icon": "3", "label": "Red remains", "color": "#ff8a7a" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "speaker": "mia",
+      "voice": "Next time you look up, you're looking at physics.",
+      "subtitle": "Next time you look up, you're looking at physics.",
+      "expression": "happy",
+      "hold": 0.5,
+      "camera": { "shot": "wide", "move": "push" },
+      "actions": { "mia": { "pose": "point", "look": "camera" }, "leo": { "pose": "cheer", "look": "up", "expression": "happy" } }
+    }
+  ]
+}

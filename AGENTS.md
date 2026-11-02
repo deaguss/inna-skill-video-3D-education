@@ -1,11 +1,11 @@
-# Instruksi untuk AI
+# Instructions for AI agents
 
-Repo ini berisi panduan membuat video animasi edukasi 3D bergaya clay lewat kode.
+This repo is a guide for creating 3D clay-style animated explainer videos with code.
 
-Kalau pengguna meminta video animasi, video edukasi, explainer, atau seri "Raka vs Dina", baca `SKILL.md` sampai selesai dan ikuti alurnya. Baca `references/panduan-adegan.md` sebelum mengarahkan adegan.
+When the user asks for an animated video, educational video, or explainer, read `SKILL.md` in full and follow its workflow. Read `references/scene-guide.md` when writing `script.json`.
 
-Tiga hal yang paling penting, karena pernah membuat laptop freeze atau merusak hasil:
+The three rules that matter most, because breaking them has frozen a laptop or ruined a result:
 
-- Render lewat CPU dengan `--ringan` dan selalu pasang `--batas`. Mulai dari satu frame.
-- Kalau uji gagal, berhenti dan tanya pengguna. Jangan mencoba ulang berkali-kali.
-- Minta izin sebelum mengunduh paket, merender video penuh, atau menghapus file.
+- Render on the CPU with `--light`, always set `--limit`, and start with one frame.
+- If a test fails, find out why before retrying, and ask the user if their machine may be at risk.
+- Ask before downloading packages, rendering a full video, or deleting files.
