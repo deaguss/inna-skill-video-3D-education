@@ -9,6 +9,12 @@ Skill ini mengubah topik menjadi video vertikal 3D bergaya clay tanpa software 3
 
 Pengguna biasanya bukan programmer. Jelaskan dengan bahasa sehari-hari, gunakan bahasa pengguna, dan tunjukkan hasil, bukan kode.
 
+Panduan ini berlaku untuk AI apa pun yang bisa membaca file dan menjalankan perintah. Sesuaikan kalau alatnya terbatas:
+
+- **Tidak bisa melihat gambar:** minta pengguna memeriksa `lembar.png`, lalu perbaiki sesuai laporan mereka. Jangan mengaku sudah memeriksa gambar.
+- **Tidak bisa menjalankan proses di latar belakang:** berikan perintah render penuh untuk dijalankan pengguna di terminal, supaya perintahnya tidak terputus karena batas waktu.
+- **Tidak bisa menjalankan perintah sama sekali:** bantu naskah dan kode, lalu berikan perintahnya satu per satu untuk dijalankan pengguna.
+
 ## Alur kerja
 
 Kerjakan berurutan. Revisi naskah gratis, sedangkan render makan waktu, jadi minta persetujuan sebelum tahap yang mahal.

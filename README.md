@@ -1,8 +1,8 @@
 # video-edukasi-3d
 
-Skill Claude Code untuk membuat video animasi edukasi 3D bergaya clay lewat kode, dari naskah sampai MP4 vertikal. Tanpa software 3D dan tanpa menggambar manual.
+Panduan untuk AI coding agent supaya bisa membuat video animasi edukasi 3D bergaya clay lewat kode, dari naskah sampai MP4 vertikal. Tanpa software 3D dan tanpa menggambar manual.
 
-*A Claude Code skill that turns a script into a vertical 3D clay-style explainer video using Three.js, Puppeteer, and FFmpeg. The script and docs are in Indonesian.*
+*A guide for AI coding agents that turns a script into a vertical 3D clay-style explainer video using Three.js, Puppeteer, and FFmpeg. The script and docs are in Indonesian.*
 
 Contoh yang disertakan adalah seri "Raka vs Dina" tentang money management di trading, tapi set dan karakternya bisa diubah untuk topik lain.
 
@@ -16,15 +16,34 @@ Contoh yang disertakan adalah seri "Raka vs Dina" tentang money management di tr
 
 ## Pasang
 
-Salin folder ini ke folder skill Claude Code:
+Cara paling umum, dan bisa dipakai di AI mana pun yang bisa membaca file dan menjalankan perintah:
+
+```bash
+git clone https://github.com/deaguss/inna-skill-video-3D-education.git video-edukasi-3d
+```
+
+Buka folder `video-edukasi-3d` di alat AI kamu, lalu minta misalnya: "Bikin video animasi 3D tentang stop loss, 45 detik, buat TikTok."
+
+| Alat AI | File yang dibaca otomatis |
+|---|---|
+| Claude Code | `CLAUDE.md` |
+| Codex CLI | `AGENTS.md` |
+| Gemini CLI | `GEMINI.md` |
+| Cursor | `.cursor/rules/video-edukasi-3d.mdc` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Alat lain | Bilang: "Baca `SKILL.md` lalu ikuti alurnya." |
+
+Semua file di atas menunjuk ke `SKILL.md`, jadi cukup perbarui satu panduan.
+
+Khusus Claude Code, skill ini juga bisa dipasang permanen supaya tersedia di semua proyek:
 
 ```bash
 git clone https://github.com/deaguss/inna-skill-video-3D-education.git ~/.claude/skills/video-edukasi-3d
 ```
 
-Lalu minta ke Claude Code, misalnya: "Bikin video animasi 3D tentang stop loss, 45 detik, buat TikTok."
-
 Butuh Node.js 18 atau lebih baru. Saat proyek video pertama dibuat, npm mengunduh Three.js, Chrome, dan FFmpeg ke folder proyek, totalnya sekitar 800 MB.
+
+AI versi chat di browser, seperti ChatGPT atau Gemini di web, tidak bisa menjalankan render di laptop kamu. Di sana kamu cuma bisa memakai panduan ini untuk naskah dan kode, lalu menjalankan perintahnya sendiri.
 
 ## Batasan
 
@@ -32,7 +51,7 @@ Butuh Node.js 18 atau lebih baru. Saat proyek video pertama dibuat, npm mengundu
 - Suara tidak dibuat oleh skill ini. Siapkan rekaman sendiri atau hasil layanan TTS.
 - Bibir hanya buka-tutup, bukan lip-sync presisi.
 - Render lewat GPU bisa membebani laptop dengan GPU terintegrasi, jadi defaultnya CPU.
-- Sejauh ini diuji di Windows 11.
+- Sejauh ini baru diuji di Windows 11 dengan Claude Code. Alat AI lain belum diuji.
 
 ## Disclaimer
 
